@@ -1,9 +1,70 @@
 import { useMsal, useIsAuthenticated } from "@azure/msal-react";
+import axios from "axios";
+import { useEffect, useRef } from "react";
 
 function HomePage() {
   const { instance, accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
-  // CASE 1: User is not authenticated
+  const hasFetchedRef = useRef(false);
+
+  type LoginResponse = {
+    isSuccess: boolean;
+    result: {
+      token: string;
+      user: { email: string; firstName: string; lastName: string };
+    };
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    if (hasFetchedRef.current) return;
+
+    const account =
+      instance.getActiveAccount() ?? (accounts.length > 0 ? accounts[0] : null);
+    if (!account) {
+      console.log("[Home] No active account yet.");
+      return;
+    }
+    hasFetchedRef.current = true;
+
+    const fetchUserData = async () => {
+      try {
+        if (!instance.getActiveAccount()) {
+          instance.setActiveAccount(account);
+        }
+
+        const { idToken } = await instance.acquireTokenSilent({
+          account,
+          scopes: ["openid", "profile", "email"],
+        });
+
+        const { data } = await axios.post<LoginResponse>(
+          "http://localhost:3000/api/login",
+          { token: idToken }        );
+
+        if (!data?.isSuccess || !data.result?.token) {
+          throw new Error("Invalid backend response");
+        }
+
+        const { token, user } = data.result;
+        sessionStorage.setItem("accessToken", token);
+        if (user?.email) sessionStorage.setItem("Email", user.email);
+        if (user?.firstName) sessionStorage.setItem("FirstName", user.firstName);
+        if (user?.lastName) sessionStorage.setItem("LastName", user.lastName);
+
+        console.log("[Home] User data stored.");
+      } catch (error) {
+        // Allow retry on next render if needed
+        hasFetchedRef.current = false;
+        console.error("[Home] Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [isAuthenticated, instance, accounts]);
+
+  console.log("Accounts:", accounts);
+
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
@@ -18,17 +79,15 @@ function HomePage() {
     );
   }
 
-  const account = accounts[0];
-  // CASE 2: User is authenticated
+  const account = instance.getActiveAccount() ?? accounts[0];
+
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-green-50">
       <h1 className="text-3xl font-bold text-green-700 mb-4">Login สำเร็จ! 🎉</h1>
-
       <div className="bg-white p-6 rounded-lg shadow-md">
         <p className="font-bold">User Info:</p>
         <pre className="text-sm text-gray-600 mt-2">{JSON.stringify(account, null, 2)}</pre>
       </div>
-
       <button
         onClick={() => instance.logoutRedirect({ postLogoutRedirectUri: "/" })}
         className="mt-6 px-6 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
@@ -39,4 +98,4 @@ function HomePage() {
   );
 }
 
-export default HomePage;  
+export default HomePage;

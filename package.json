@@ -13,9 +13,13 @@
     "@azure/msal-browser": "^4.26.2",
     "@azure/msal-react": "^3.0.22",
     "@tailwindcss/vite": "^4.1.17",
+    "axios": "^1.13.2",
+    "i18next": "^25.7.3",
+    "i18next-browser-languagedetector": "^8.2.0",
     "oidc-client-ts": "^3.4.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-i18next": "^16.5.0",
     "react-oidc-context": "^3.3.0",
     "react-router-dom": "^6.30.2",
     "tailwindcss": "^4.1.17"
