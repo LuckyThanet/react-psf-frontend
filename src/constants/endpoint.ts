@@ -14,5 +14,11 @@ export const ENDPOINTS = {
     CURRENTSUBMISSION: (lang: string) => 
         `${BASE_URL}/current-submissions?language=${lang}`,
     
-    POLLSUBMISSIONS: `${BASE_URL}/poll-submissions`
+    POLLSUBMISSIONS: `${BASE_URL}/poll-submissions`,
+
+    EXPORT_SUBMISSION: (lang: string) => 
+        `${BASE_URL}/submissions/export?language=${lang}`,
+
+    EXPORT_ADMIN_SUBMISSION: (lang: string) => 
+        `${BASE_URL}/submissions/admin/export?language=${lang}`,
 };

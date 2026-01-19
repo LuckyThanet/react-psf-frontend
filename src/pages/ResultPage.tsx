@@ -8,7 +8,7 @@ type SubmissionResponse = {
         scores: Array<{
             linkItemID: number;
             psfCode: string;
-            type: string; 
+            type: string;
             description: string;
             userCount: number;
             totalCount: number;
@@ -33,8 +33,23 @@ const ResultPage = () => {
     const [pollQuestions, setPollQuestions] = useState<PollQuestionsResponse["result"]>([]);
     const [selectedPollChoices, setSelectedPollChoices] = useState<Record<number, number[]>>({});
     const [language] = useState<string>("th");
+    const [sessionValue, setSessionValue] = useState<string | null>(null);
+    const adminEmail = [
+        "sirawit.arsa@kmutt.ac.th",
+		"thanet.jomp@kmutt.ac.th",
+		"metta.mon@kmutt.ac.th",
+		"phaithun.ana@kmutt.ac.th",
+    ]
 
     useEffect(() => {
+        const storedEmail = sessionStorage.getItem('Email');
+        if (storedEmail) {
+            try {
+                setSessionValue(JSON.parse(storedEmail));
+            } catch {
+                setSessionValue(storedEmail);
+            }
+        }
         const fetchPoll = async () => {
             try {
                 const { data } = await api.get<PollQuestionsResponse>(ENDPOINTS.POLLQUESTIONS(language));
@@ -61,11 +76,14 @@ const ResultPage = () => {
         return "bg-yellow-400";
     };
 
-    const handlePollChange = (questionID: number, choiceID: number, isMultiple: boolean) => {
+    const handlePollChange = (questionID: number, choiceID: number) => {
         const current = selectedPollChoices[questionID] || [];
+
+        const isMultiple = questionID !== 2;
+
         if (isMultiple) {
-            const next = current.includes(choiceID) 
-                ? current.filter(id => id !== choiceID) 
+            const next = current.includes(choiceID)
+                ? current.filter(id => id !== choiceID)
                 : [...current, choiceID];
             setSelectedPollChoices({ ...selectedPollChoices, [questionID]: next });
         } else {
@@ -86,6 +104,61 @@ const ResultPage = () => {
             window.location.reload();
         } catch (error) {
             alert("เกิดข้อผิดพลาด");
+        }
+    };
+
+    const handleDownloadReport = async () => {
+        try {
+            // เรียกใช้ API export โดยระบุ responseType เป็น blob
+            const response = await api.get(ENDPOINTS.EXPORT_SUBMISSION(language), {
+                responseType: 'blob',
+            });
+
+            // สร้าง Link ชั่วคราวเพื่อสั่ง Download
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+
+            // กำหนดชื่อไฟล์ (หรือจะดึงจาก Header Content-Disposition ก็ได้)
+            link.setAttribute('download', `PSF_Report_${new Date().getTime()}.xlsx`);
+
+            document.body.appendChild(link);
+            link.click();
+
+            // ทำความสะอาด
+            link.parentNode?.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Download error:", error);
+            alert("ไม่สามารถดาวน์โหลดรายงานได้ในขณะนี้");
+        }
+    };
+
+    const handleAdminDownloadReport = async () => {
+        if (!sessionValue || !adminEmail.includes(sessionValue)) {
+            alert("You don't have permission in this file");
+            return;
+        }
+
+        try {
+            const response = await api.get(ENDPOINTS.EXPORT_ADMIN_SUBMISSION(language), {
+                responseType: 'blob',
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+
+            link.setAttribute('download', `PSF_Summary_Report_${new Date().getTime()}.xlsx`);
+
+            document.body.appendChild(link);
+            link.click();
+
+            link.parentNode?.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Download error:", error);
+            alert("ไม่สามารถดาวน์โหลดรายงานได้ในขณะนี้");
         }
     };
 
@@ -135,18 +208,35 @@ const ResultPage = () => {
                 <h3 className="font-bold mb-2">สถานะผลการประเมิน:</h3>
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-green-500"></div> 
+                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
                         <span>หมายถึง พฤติกรรมการสอนของท่านสอดคล้องกับคุณลักษณะที่คาดหวังในสมรรถนะระดับ Competent/Proficient</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-yellow-400"></div> 
+                        <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                         <span>หมายถึง พฤติกรรมการสอนของท่านสอดคล้องกับคุณลักษณะที่คาดหวังเพียงบางส่วน</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-gray-400"></div> 
+                        <div className="w-3 h-3 rounded-full bg-gray-400"></div>
                         <span>หมายถึง พฤติกรรมการสอนของท่านยังไม่สอดคล้องกับคุณลักษณะที่คาดหวัง</span>
                     </div>
                 </div>
+            </div>
+
+            <div className="flex flex-row gap-4 mt-8">
+                <button
+                    onClick={handleDownloadReport}
+                    className="bg-blue-600 text-white px-10 py-2 rounded-4xl hover:bg-blue-700 transition-all font-semibold"
+                >
+                    Download report
+                </button>
+                {sessionValue && adminEmail.includes(sessionValue) && (
+                    <button
+                        onClick={handleAdminDownloadReport}
+                        className="bg-green-600 text-white px-10 py-2 rounded-4xl hover:bg-green-700 transition-all font-semibold"
+                    >
+                        Download summary report
+                    </button>
+                )}
             </div>
 
             {/* --- Section 3: Poll Questions --- */}
@@ -154,15 +244,19 @@ const ResultPage = () => {
                 <h2 className="text-lg font-bold mb-6">หลังจากได้ทำแบบประเมินเรียบร้อยแล้ว เราอยากทราบความคิดเห็นของท่าน</h2>
                 {pollQuestions.map((poll) => (
                     <div key={poll.id} className="mb-8">
-                        <p className="font-semibold mb-4 text-gray-800">{poll.translations[0]?.questionText}</p>
+                        <p className="font-semibold mb-4 text-gray-800">
+                            {poll.translations[0]?.questionText}
+                        </p>
                         <div className="space-y-2 ml-4">
                             {poll.choices.map((choice) => (
                                 <label key={choice.id} className="flex items-center gap-3 cursor-pointer group">
-                                    <input 
-                                        type="checkbox" // หรือสลับเป็น radio ตามเงื่อนไข UI
+                                    <input
+                                        type={poll.id === 2 ? "radio" : "checkbox"}
                                         className="w-4 h-4 accent-blue-600"
+                                        // กำหนดชื่อกลุ่มสำหรับ radio เพื่อให้ browser จัดการการเลือกให้อัตโนมัติในระดับหนึ่ง
+                                        name={`poll-${poll.id}`}
                                         checked={(selectedPollChoices[poll.id] || []).includes(choice.id)}
-                                        onChange={() => handlePollChange(poll.id, choice.id, true)}
+                                        onChange={() => handlePollChange(poll.id, choice.id)}
                                     />
                                     <span className="text-sm group-hover:text-blue-600 transition-colors">
                                         {choice.translations[0]?.choiceText}
@@ -172,9 +266,9 @@ const ResultPage = () => {
                         </div>
                     </div>
                 ))}
-                
+
                 <div className="text-center mt-10">
-                    <button 
+                    <button
                         onClick={handleSubmitPoll}
                         className="bg-blue-600 text-white px-10 py-2 rounded-md hover:bg-blue-700 shadow-md transition-all font-semibold"
                     >
