@@ -252,7 +252,7 @@ const ResultPage = () => {
                                 <label key={choice.id} className="flex items-center gap-3 cursor-pointer group">
                                     <input
                                         type={poll.id === 2 ? "radio" : "checkbox"}
-                                        className="w-4 h-4 accent-blue-600"
+                                        className="accent-blue-600"
                                         // กำหนดชื่อกลุ่มสำหรับ radio เพื่อให้ browser จัดการการเลือกให้อัตโนมัติในระดับหนึ่ง
                                         name={`poll-${poll.id}`}
                                         checked={(selectedPollChoices[poll.id] || []).includes(choice.id)}
