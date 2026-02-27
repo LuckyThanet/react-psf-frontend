@@ -10,7 +10,7 @@ function HomePage() {
   const { instance, accounts, inProgress } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const hasFetchedRef = useRef(false);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   type LoginResponse = {
     isSuccess: boolean;
@@ -126,6 +126,11 @@ function HomePage() {
           <p className="text-sm text-gray-600 mt-2">
             {t('home.section3Body')}
           </p>
+          {t('home.section4Body') && i18n.language === 'en' && (
+            <p className="text-sm text-gray-600 mt-2">
+              {t('home.section4Body')}
+            </p>
+          )}
         </div>
       </div>
     </div>

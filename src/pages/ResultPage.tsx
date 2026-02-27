@@ -172,6 +172,11 @@ const ResultPage = () => {
     return (
         <div className="max-w-6xl mx-auto p-6 font-sans bg-white shadow-lg my-10 rounded-lg">
             <h1 className="text-2xl font-bold text-center mb-8">{t('result.title')}</h1>
+            {t('result.subTitle') && i18n.language === 'en' && (
+                <p className="text-sm text-gray-600 mb-8 text-start">
+                    {t('result.subTitle')}
+                </p>
+            )}
 
             {/* --- Section 1: PSF Scores Table --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 border p-6 rounded-md">
@@ -208,6 +213,9 @@ const ResultPage = () => {
             <div className="mt-8 p-4 bg-gray-50 rounded-md text-sm border">
                 <h3 className="font-bold mb-2">{t('result.statusTitle')}</h3>
                 <div className="flex flex-col gap-2">
+                    {t(`result.statusSubTitle`) && i18n.language === 'en' && (
+                        <p className="text-gray-600 mb-2">{t('result.statusSubTitle')}</p>
+                    )}
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-green-500"></div>
                         <span>{t('result.statusGreen')}</span>

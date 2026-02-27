@@ -39,7 +39,7 @@ const FormPage = () => {
                 );
                 setQuestionData(data);
             } catch (error) {
-                console.error("Server error" , error);
+                console.error("Server error", error);
             }
         };
         fetchQuestion();
@@ -91,6 +91,9 @@ const FormPage = () => {
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg font-sans text-[#333]">
             <div className="mb-8">
+                <p className="text-sm text-gray-600 mb-4 text-start">
+                    {t('form.subTitle')}
+                </p>
                 <h2 className="text-2xl font-semibold mb-2">
                     {questionCount}. {currentQuestion.translations[0]?.question}
                 </h2>

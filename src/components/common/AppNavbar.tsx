@@ -17,8 +17,12 @@ const AppNavbar: React.FC<AppNavbarProps> = () => {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
 
-    const toggleLanguage = () => {
-        i18n.changeLanguage(i18n.language === 'th' ? 'en' : 'th');
+    const toggleLanguage = (language: string) => {
+        if (language === 'th') {
+            i18n.changeLanguage('th');
+        } else {
+            i18n.changeLanguage('en');
+        }
     };
     const isSessionValid = (): boolean => {
         return !!sessionStorage.getItem('accessToken');
@@ -40,7 +44,6 @@ const AppNavbar: React.FC<AppNavbarProps> = () => {
             });
         } catch (e) {
             console.error("Logout error:", e);
-            // window.location.assign("/");
             navigate("/");
         } finally {
             setLoggingOut(false);
@@ -88,13 +91,23 @@ const AppNavbar: React.FC<AppNavbarProps> = () => {
                                 {/* User & Logout Group (จัด Flex ให้ตรงกัน) */}
                                 <div className="ml-4 flex items-center gap-4">
                                     {/* Language Switcher */}
-                                    <button
-                                        type="button"
-                                        onClick={toggleLanguage}
-                                        className="px-3 py-1 border border-gray-400 text-gray-300 rounded hover:border-white hover:text-white text-sm transition"
-                                    >
-                                        {i18n.language === 'th' ? 'EN' : 'TH'}
-                                    </button>
+                                    <div className="flex flex-row items-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleLanguage('th')}
+                                            className="px-1 text-gray-300 hover:text-white hover:underline text-sm transition"
+                                        >
+                                            TH
+                                        </button>
+                                        <span className="font-medium px-1 text-gray-300">|</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleLanguage('en')}
+                                            className="px-1 text-gray-300 hover:text-white hover:underline text-sm transition"
+                                        >
+                                            EN
+                                        </button>
+                                    </div>
                                     {isSessionValid() && (
                                         <>
                                             <div className="text-gray-300 font-medium">
@@ -141,13 +154,23 @@ const AppNavbar: React.FC<AppNavbarProps> = () => {
                     <div className="lg:hidden bg-[#4b4f54] pb-3 border-t border-gray-600">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                             {/* Mobile Language Switcher */}
-                            <button
-                                type="button"
-                                onClick={toggleLanguage}
-                                className="w-full text-left text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-                            >
-                                {i18n.language === 'th' ? 'English (EN)' : 'ภาษาไทย (TH)'}
-                            </button>
+                            <div className="flex flex-row items-center">
+                                <button
+                                    type="button"
+                                    onClick={() => toggleLanguage('th')}
+                                    className="px-1 text-gray-300 hover:text-white hover:underline text-sm transition"
+                                >
+                                    TH
+                                </button>
+                                <span className="font-medium px-1 text-gray-300">|</span>
+                                <button
+                                    type="button"
+                                    onClick={() => toggleLanguage('en')}
+                                    className="px-1 text-gray-300 hover:text-white hover:underline text-sm transition"
+                                >
+                                    EN
+                                </button>
+                            </div>
                             {isSessionValid() && (
                                 <>
                                     <Link to="/form" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
