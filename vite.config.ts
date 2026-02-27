@@ -11,6 +11,5 @@ export default defineConfig({
       key: readFileSync("./localhost+2-key.pem"),
       cert: readFileSync("./localhost+2.pem"),
     },
-    port: 5173,
   },
 });

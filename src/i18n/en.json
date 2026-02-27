@@ -1,5 +1,44 @@
 {
-    "translation":{
-        
-    }
+  "nav": {
+    "form": "Assessment Form",
+    "result": "Assessment Results",
+    "greeting": "Hi, {{name}}",
+    "defaultUser": "User",
+    "logout": "Log out",
+    "loggingOut": "Logging out..."
+  },
+  "form": {
+    "loading": "Loading...",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "submitSuccess": "Answers saved successfully",
+    "submitError": "An error occurred while submitting answers"
+  },
+  "result": {
+    "title": "Teaching Competency Level Based on the KMUTT PSF Framework",
+    "statusTitle": "Assessment Status:",
+    "statusGreen": "Your teaching behavior aligns with the expected characteristics for Competent/Proficient level",
+    "statusYellow": "Your teaching behavior partially aligns with the expected characteristics",
+    "statusGray": "Your teaching behavior does not yet align with the expected characteristics",
+    "downloadReport": "Download report",
+    "downloadSummary": "Download summary report",
+    "pollTitle": "After completing the assessment, we'd like to know your opinion",
+    "pollSubmit": "Submit",
+    "noData": "No assessment results found",
+    "saveSuccess": "Data saved successfully",
+    "saveError": "An error occurred",
+    "downloadError": "Unable to download report at this time",
+    "permissionError": "You don't have permission to access this file"
+  },
+  "home": {
+    "title": "Self-Assessment Survey Based on the KMUTT PSF Framework (Teaching and Supporting Learning)",
+    "loginBtn": "Login with KMUTT Account",
+    "section1Title": "What is this survey for?",
+    "section1Body": "This self-assessment survey was developed to help you evaluate yourself against the KMUTT Professional Standards Framework for Teaching and Supporting Learning (KMUTT PSF) at the Competent and Proficient levels — identifying which competencies you already demonstrate, suggesting areas for further development, and recommending activities or learning resources to enhance your teaching practice. You may also use this information to support your application for KMUTT PSF certification in teaching and learning.",
+    "section2Title": "How is this survey used?",
+    "section2Body": "This survey maps each element defined in the KMUTT PSF (Teaching and Supporting Learning) at the Competent and Proficient levels into just 8 checklist questions, where you select the options that best describe your teaching practice. It takes approximately 3–5 minutes to complete. Your responses are then mapped back to the relevant competency descriptors at each level. The results serve as an estimate of your competencies based on your self-reported experience and are intended only as a preliminary guide — they do not constitute a final determination of whether you have achieved or not achieved a given competency level.",
+    "section3Title": "What will your responses be used for?",
+    "section3Body": "Your data will be stored so that you can review the results of your completed survey. At the same time, we will use aggregated data to design professional development initiatives that align with the needs of the KMUTT community. Access to individual data will be limited to those directly involved in faculty development. Information presented to university administrators will reflect only aggregated institutional and faculty-level trends."
+  }
 }

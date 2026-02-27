@@ -8,7 +8,6 @@ import { InteractionType } from "@azure/msal-browser";
 import ResultPage from "./pages/ResultPage";
 import FormPage from "./pages/FormPage";
 
-
 function Layout() {
   return (
     <div>
@@ -19,8 +18,8 @@ function Layout() {
 }
 
 
-function App() {
-  // console.log("test" , import.meta.env.VITE_ADFS_CLIENTID);
+function App() { 
+
   return (
     <Routes>
       <Route element={<Layout />}>
@@ -61,7 +60,7 @@ function App() {
       </Route>
 
 
-      {/* <Route path="/auth/callback" element={<CallbackPage />} /> */ }
+      {/* <Route path="/auth/callback" element={<CallbackPage />} /> */}
       <Route path="/redirect" element={<CallbackPage />} />
       <Route path="*" element={<div>404 Not Found</div>} />
     </Routes >

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/axios";
 import { ENDPOINTS } from "../constants/endpoint";
+import { useTranslation } from "react-i18next";
 
 type SubmissionResponse = {
     isSuccess: boolean;
@@ -32,13 +33,13 @@ const ResultPage = () => {
     const [submissionData, setSubmissionData] = useState<SubmissionResponse["result"]["scores"]>([]);
     const [pollQuestions, setPollQuestions] = useState<PollQuestionsResponse["result"]>([]);
     const [selectedPollChoices, setSelectedPollChoices] = useState<Record<number, number[]>>({});
-    const [language] = useState<string>("th");
+    const { t, i18n } = useTranslation();
     const [sessionValue, setSessionValue] = useState<string | null>(null);
     const adminEmail = [
         "sirawit.arsa@kmutt.ac.th",
-		"thanet.jomp@kmutt.ac.th",
-		"metta.mon@kmutt.ac.th",
-		"phaithun.ana@kmutt.ac.th",
+        "thanet.jomp@kmutt.ac.th",
+        "metta.mon@kmutt.ac.th",
+        "phaithun.ana@kmutt.ac.th",
     ]
 
     useEffect(() => {
@@ -52,7 +53,7 @@ const ResultPage = () => {
         }
         const fetchPoll = async () => {
             try {
-                const { data } = await api.get<PollQuestionsResponse>(ENDPOINTS.POLLQUESTIONS(language));
+                const { data } = await api.get<PollQuestionsResponse>(ENDPOINTS.POLLQUESTIONS(i18n.language));
                 if (data.isSuccess) setPollQuestions(data.result);
             } catch (error) {
                 console.error("Error fetching poll:", error);
@@ -60,7 +61,7 @@ const ResultPage = () => {
         };
         const fetchCurrentSubmission = async () => {
             try {
-                const { data } = await api.get<SubmissionResponse>(ENDPOINTS.CURRENTSUBMISSION(language));
+                const { data } = await api.get<SubmissionResponse>(ENDPOINTS.CURRENTSUBMISSION(i18n.language));
                 if (data.isSuccess) setSubmissionData(data.result.scores)
             } catch (error) {
                 console.error("Error fetching poll:", error);
@@ -68,7 +69,7 @@ const ResultPage = () => {
         };
         fetchPoll();
         fetchCurrentSubmission();
-    }, []);
+    }, [i18n.language]);
 
     const getStatusColor = (userCount: number, totalCount: number) => {
         if (userCount === 0) return "bg-gray-400";
@@ -100,17 +101,17 @@ const ResultPage = () => {
         };
         try {
             await api.post(ENDPOINTS.POLLSUBMISSIONS, payload);
-            alert("บันทึกข้อมูลสำเร็จ");
+            alert(t('result.saveSuccess'));
             window.location.reload();
         } catch (error) {
-            alert("เกิดข้อผิดพลาด");
+            alert(t('result.saveError') + " " + error);
         }
     };
 
     const handleDownloadReport = async () => {
         try {
             // เรียกใช้ API export โดยระบุ responseType เป็น blob
-            const response = await api.get(ENDPOINTS.EXPORT_SUBMISSION(language), {
+            const response = await api.get(ENDPOINTS.EXPORT_SUBMISSION(i18n.language), {
                 responseType: 'blob',
             });
 
@@ -130,18 +131,18 @@ const ResultPage = () => {
             window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Download error:", error);
-            alert("ไม่สามารถดาวน์โหลดรายงานได้ในขณะนี้");
+            alert(t('result.downloadError'));
         }
     };
 
     const handleAdminDownloadReport = async () => {
         if (!sessionValue || !adminEmail.includes(sessionValue)) {
-            alert("You don't have permission in this file");
+            alert(t('result.permissionError'));
             return;
         }
 
         try {
-            const response = await api.get(ENDPOINTS.EXPORT_ADMIN_SUBMISSION(language), {
+            const response = await api.get(ENDPOINTS.EXPORT_ADMIN_SUBMISSION(i18n.language), {
                 responseType: 'blob',
             });
 
@@ -158,11 +159,11 @@ const ResultPage = () => {
             window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Download error:", error);
-            alert("ไม่สามารถดาวน์โหลดรายงานได้ในขณะนี้");
+            alert(t('result.downloadError'));
         }
     };
 
-    if (!submissionData) return <div className="p-10 text-center">ไม่พบข้อมูลผลการประเมิน</div>;
+    if (!submissionData) return <div className="p-10 text-center">{t('result.noData')}</div>;
 
     const submissions = submissionData;
     const competentScores = submissions.filter(s => s.type === "Competent");
@@ -170,7 +171,7 @@ const ResultPage = () => {
 
     return (
         <div className="max-w-6xl mx-auto p-6 font-sans bg-white shadow-lg my-10 rounded-lg">
-            <h1 className="text-2xl font-bold text-center mb-8">ระดับสมรรถนะการเรียนการสอนตามกรอบแนวคิด KMUTT PSF</h1>
+            <h1 className="text-2xl font-bold text-center mb-8">{t('result.title')}</h1>
 
             {/* --- Section 1: PSF Scores Table --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 border p-6 rounded-md">
@@ -205,19 +206,19 @@ const ResultPage = () => {
 
             {/* --- Section 2: Legend --- */}
             <div className="mt-8 p-4 bg-gray-50 rounded-md text-sm border">
-                <h3 className="font-bold mb-2">สถานะผลการประเมิน:</h3>
+                <h3 className="font-bold mb-2">{t('result.statusTitle')}</h3>
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                        <span>หมายถึง พฤติกรรมการสอนของท่านสอดคล้องกับคุณลักษณะที่คาดหวังในสมรรถนะระดับ Competent/Proficient</span>
+                        <span>{t('result.statusGreen')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                        <span>หมายถึง พฤติกรรมการสอนของท่านสอดคล้องกับคุณลักษณะที่คาดหวังเพียงบางส่วน</span>
+                        <span>{t('result.statusYellow')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-                        <span>หมายถึง พฤติกรรมการสอนของท่านยังไม่สอดคล้องกับคุณลักษณะที่คาดหวัง</span>
+                        <span>{t('result.statusGray')}</span>
                     </div>
                 </div>
             </div>
@@ -225,23 +226,23 @@ const ResultPage = () => {
             <div className="flex flex-row gap-4 mt-8">
                 <button
                     onClick={handleDownloadReport}
-                    className="bg-blue-600 text-white px-10 py-2 rounded-4xl hover:bg-blue-700 transition-all font-semibold"
+                    className="bg-blue-600 text-white px-10 py-2 rounded-4xl hover:bg-blue-700 transition-all font-semibold cursor-pointer"
                 >
-                    Download report
+                    {t('result.downloadReport')}
                 </button>
                 {sessionValue && adminEmail.includes(sessionValue) && (
                     <button
                         onClick={handleAdminDownloadReport}
-                        className="bg-green-600 text-white px-10 py-2 rounded-4xl hover:bg-green-700 transition-all font-semibold"
+                        className="bg-green-600 text-white px-10 py-2 rounded-4xl hover:bg-green-700 transition-all font-semibold cursor-pointer"
                     >
-                        Download summary report
+                        {t('result.downloadSummary')}
                     </button>
                 )}
             </div>
 
             {/* --- Section 3: Poll Questions --- */}
             <div className="mt-12 border-t pt-8">
-                <h2 className="text-lg font-bold mb-6">หลังจากได้ทำแบบประเมินเรียบร้อยแล้ว เราอยากทราบความคิดเห็นของท่าน</h2>
+                <h2 className="text-lg font-bold mb-6">{t('result.pollTitle')}</h2>
                 {pollQuestions.map((poll) => (
                     <div key={poll.id} className="mb-8">
                         <p className="font-semibold mb-4 text-gray-800">
@@ -272,7 +273,7 @@ const ResultPage = () => {
                         onClick={handleSubmitPoll}
                         className="bg-blue-600 text-white px-10 py-2 rounded-md hover:bg-blue-700 shadow-md transition-all font-semibold"
                     >
-                        Submit
+                        {t('result.pollSubmit')}
                     </button>
                 </div>
             </div>

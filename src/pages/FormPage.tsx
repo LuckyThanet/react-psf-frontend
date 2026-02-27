@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { api } from "../lib/axios"
 import { useNavigate } from "react-router-dom";
 import { ENDPOINTS } from "../constants/endpoint";
+import { useTranslation } from "react-i18next";
 
 type QuestionResponse = {
     isSuccess: boolean;
@@ -24,25 +25,25 @@ type SubmissionRequest = {
 
 const FormPage = () => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const [questionCount, setQuestionCount] = useState<number>(1);
     const [questionData, setQuestionData] = useState<QuestionResponse | null>(null);
     const [selectedChoices, setSelectedChoices] = useState<Record<number, number[]>>({});
-    const [language] = useState<string>("th");
     const TOTAL_QUESTIONS = 8; // กำหนดจำนวนข้อสูงสุด
 
     useEffect(() => {
         const fetchQuestion = async () => {
             try {
                 const { data } = await api.get<QuestionResponse>(
-                    ENDPOINTS.QUESTIONS(questionCount, language)
+                    ENDPOINTS.QUESTIONS(questionCount, i18n.language)
                 );
                 setQuestionData(data);
             } catch (error) {
-                console.error("Server error");
+                console.error("Server error" , error);
             }
         };
         fetchQuestion();
-    }, [questionCount, language]);
+    }, [questionCount, i18n.language]);
 
     const handleToggleChoice = (choiceID: number) => {
         const currentAnswers = selectedChoices[questionCount] || [];
@@ -71,18 +72,18 @@ const FormPage = () => {
             };
 
             const { data } = await api.post(ENDPOINTS.SUBMISSIONS, payload);
-            
+
             if (data.isSuccess) {
-                alert("บันทึกคำตอบเรียบร้อยแล้ว");
+                alert(t('form.submitSuccess'));
                 navigate("/result");
             }
         } catch (error) {
             console.error("Submit error:", error);
-            alert("เกิดข้อผิดพลาดในการส่งคำตอบ");
+            alert(t('form.submitError'));
         }
     };
 
-    if (!questionData) return <div className="p-10 text-center">กำลังโหลด...</div>;
+    if (!questionData) return <div className="p-10 text-center">{t('form.loading')}</div>;
 
     const currentQuestion = questionData.result;
     const userAnswers = selectedChoices[questionCount] || [];
@@ -97,8 +98,8 @@ const FormPage = () => {
 
             <div className="space-y-4 mb-10">
                 {currentQuestion.choices.map((choice) => (
-                    <label 
-                        key={choice.id} 
+                    <label
+                        key={choice.id}
                         className="flex items-start gap-3 p-2 cursor-pointer hover:bg-gray-50 rounded-md transition-colors"
                     >
                         <input
@@ -120,23 +121,23 @@ const FormPage = () => {
                     disabled={questionCount === 1}
                     className="px-6 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500 disabled:opacity-30"
                 >
-                    ย้อนกลับ
+                    {t('form.back')}
                 </button>
-                
+
                 {/* เช็คว่าถ้าเป็นข้อสุดท้ายให้แสดงปุ่ม ส่งคำตอบ */}
                 {questionCount === TOTAL_QUESTIONS ? (
                     <button
                         onClick={handleSubmitAnswer}
                         className="px-8 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 shadow-md font-bold"
                     >
-                        ส่งคำตอบ
+                        {t('form.submit')}
                     </button>
                 ) : (
                     <button
                         onClick={() => setQuestionCount(prev => prev + 1)}
                         className="px-8 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-md"
                     >
-                        ถัดไป
+                        {t('form.next')}
                     </button>
                 )}
             </div>
